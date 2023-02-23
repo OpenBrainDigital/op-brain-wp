@@ -3,7 +3,7 @@ WordPres and Open AI
 
 === OPEN-BRAIN === 
 
-Plugin Name: OPEN-BRAIN__
+Plugin Name: OPEN-BRAIN
 
 Plugin URI: **[https://openbrain.digital/services/wp_openbrain_plugin](https://openbrain.digital/services/wp_openbrain_plugin)** 
 
