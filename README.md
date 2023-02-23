@@ -2,7 +2,7 @@
 WordPres and Open AI
 
 === OPEN-BRAIN === 
-Plugin Name: OPEN-BRAIN
+Plugin Name: OPEN-BRAIN__
 Plugin URI: https://openbrain.digital/services/wp_openbrain_plugin
 Description: A WordPress plugin that uses OpenAI to create high-quality content and improve user experience.
 Version: 0.2.0
