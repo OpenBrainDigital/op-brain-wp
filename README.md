@@ -43,16 +43,16 @@ OPEN-BRAIN is also highly customizable. You can choose from various content form
 
 In conclusion, OPEN-BRAIN is a game-changing WordPress plugin that leverages the power of OpenAI to create high-quality content, improve user experience, and boost website traffic. If you're looking to streamline your content creation process, engage your audience, and take your website to the next level, OPEN-BRAIN is the perfect tool for you.
 
-## == Installation ==
+### == Installation ==
 1. Upload the \'open-brain\' folder to \'/wp-content/plugins/\'
 2. Activate the plugin through the "Plugins" menu in WordPress
 
-## == Changelog ==
+### == Changelog ==
 
-## == 0.1.0 ==
+### == 0.1.0 ==
 Initial setup of OPEN-BRAIN
 
-## == 0.2.0 == 
+### == 0.2.0 == 
 Change to improve security
 
-## == Upgrade Notice ==
+### == Upgrade Notice ==
