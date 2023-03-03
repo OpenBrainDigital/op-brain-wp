@@ -1,0 +1,52 @@
+.text-center{text-align: center;}
+#loading{position: fixed;background: rgba(255, 255, 255, 0.8);height: 100%;width: 100%;left: 0px;right: 0px;top: 0px;bottom: 0px; text-align: center; z-index: 9999}
+#loading .logo{position: relative;top: calc(50% - 90px);animation: rotation 3s infinite linear;width: 50px;height: 50px;display: block;margin: auto;}
+#loading .text{font-size: 20px;position: relative;top: calc(50% - 70px); display: block;}
+@keyframes rotation {
+            0% {
+                transform: scale(.5) rotateY(0deg);
+                opacity: 1;
+            }
+  
+            80% {
+                transform: scale(1) rotateY(0deg);
+                opacity: 0;
+            }
+  
+            100% {
+                transform: scale(.5) rotateY(0deg);
+                opacity: 0;
+            }
+}
+
+.bg-white{background: #FFF;}
+.d-none{display: none !important;}
+#open_brain_result_image{ width: 90%; display: -webkit-box;display: -ms-flexbox;display: flex;-ms-flex-wrap: wrap;flex-wrap: wrap;margin-right: -15px;margin-left: -15px;}
+#open_brain_result_image .box{margin: 5px; padding: 10px; border: 1px solid #cecece; background:#FFF; flex-basis: 0;-webkit-box-flex: 1;-ms-flex-positive: 1;flex-grow: 1;}
+#open_brain_result_image .box:hover{box-shadow:1px 1px 5px 2px rgb(0 0 0 / 10%);}
+#open_brain_result_image .box img{width: 100%; height: auto;}
+#open_brain_result_content .content {background: #FFF;padding: 20px;}
+#open_brain_result_content .box_button{margin: 0px 0px 10px 0px;}
+@media (max-width: 767px)
+{
+    #open_brain_result_image .box{width: 100%;}
+}
+@media (min-width: 768px) and (max-width: 983px)
+{
+    #open_brain_result_image .box{width: 25%;}
+}
+@media (min-width: 984px) and (max-width: 1199px)
+{
+    #open_brain_result_image .box{width: 100%;}
+}
+@media (min-width: 1200px) 
+{
+    #open_brain_result_image .box{width: 25%;}
+}
+
+
+#wpbrain_title{}
+.page_title_icon{width: 40px; height: 40px; display: inline-block;}
+.plugin_icon_white{background-image: url('../img/icon-white.svg'); background-size: contain; background-repeat: no-repeat;}
+.plugin_icon_black{background-image: url('../img/icon-black.svg'); background-size: contain; background-repeat: no-repeat;}
+.plugin_icon_orange{background-image: url('../img/icon-orange.svg'); background-size: contain; background-repeat: no-repeat;}
