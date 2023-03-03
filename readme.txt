@@ -4,7 +4,7 @@ Tags: AI, OpenAI, ChatGPT, Content Creator
 Requires at least: 6.0.0
 Tested up to: 6.1
 Requires PHP: 7.0.0
-Stable tag: 0.2.0
+Stable tag: 0.5.0
 Author URI: https://www.linkedin.com/in/faridsaniee/
 License: GPL v2 or later
 License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
@@ -31,5 +31,8 @@ Initial setup of OPEN-BRAIN
 
 == 0.2.0 == 
 Change to improve security
+
+== 0.5.0 == 
+Update DirectMode
 
 == Upgrade Notice ==

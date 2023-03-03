@@ -3,7 +3,7 @@
 Plugin Name: OPEN-BRAIN
 Plugin URI: https://openbrain.digital/services/wp_openbrain_plugin
 Description: A WordPress plugin that uses OpenAI to create high-quality content and improve user experience.
-Version: 0.2.0
+Version: 0.5.0
 Requires at least: 6.0.0
 Requires PHP: 7.0.0
 Author: OpenBrain
@@ -27,7 +27,9 @@ if(!class_exists('open_brain_plugin') )
 		public $plugin_name = '';
 		public $plugin_site = "";
 		public $plugin_translate_scope = '';
-		public $plugin_base_url = "https://api.openbrain.digital/wp_ob/v1";
+		public $plugin_base_url = "";
+		public $plugin_base_url_openbrain = "https://api.openbrain.digital/v1";
+		public $plugin_base_url_openai = "https://api.openai.com/v1";
 		public $plugin_instant = "";
 		public $plugin_option_api_key = "";
 		public $plugin_option_debug = "";
@@ -62,7 +64,7 @@ if(!class_exists('open_brain_plugin') )
 		   	if (!isset($plugin)){$plugin = plugin_basename(__FILE__);}
 		   	if ($plugin == $plugin_file)
 		   	{
-		 	  	$site_web = array('settings' => '<a href="admin.php?page=open-brain">' . __('Settings', 'General') . '</a>');
+		 	  	$site_web = array('settings' => '<a href="admin.php?page=open-brain">' . __('Settings') . '</a>');
 		      	$actions = array_merge($actions,$site_web);
 		 	  	$site_web = array('Donate' => '<a style="color:#FF6058" target="_blank" href="https://openbrain.digital/?utm_source=donate_link&utm_medium=web&utm_campaign=plugin_'.$this->version.'"><strong>' . __('Donate', 'General') . '</strong></a>');
 		      	$actions = array_merge($actions,$site_web);
@@ -118,17 +120,20 @@ if(!class_exists('open_brain_plugin') )
 	    function plugin_style_js()
 	    {
 			wp_enqueue_style($this->plugin_name, $this->plugin_url .'assets/css/style.css');
-			wp_enqueue_script($this->plugin_name, $this->plugin_url .'assets/js/script.js',"","1.0.0",true);
+			wp_enqueue_script($this->plugin_name, $this->plugin_url .'assets/js/script.js',"",$this->version,true);
 	    }
 		private function load_options()
 		{
 			$open_brain_data = get_option($this->plugin_name."-data");
-		    if(isset($open_brain_data['api_key'])){$this->plugin_option_api_key = sanitize_key(sanitize_text_field($open_brain_data['api_key']));}
+		    if(isset($open_brain_data['api_key'])){$this->plugin_option_api_key = (sanitize_text_field($open_brain_data['api_key']));}
 		    if(isset($open_brain_data['debug']))
 		    {
 		    	$this->plugin_option_debug = $open_brain_data['debug'];
 			}
-		    if(isset($open_brain_data['direct'])){$this->plugin_option_direct = $open_brain_data['direct'];}
+		    if(isset($open_brain_data['direct']))
+		    {
+		    	$this->plugin_option_direct = $open_brain_data['direct'];
+		    }
 
 			$options = get_option($this->plugin_instant, array());
 			$change = false;
@@ -179,15 +184,15 @@ if(!class_exists('open_brain_plugin') )
 				switch ($current_screen->base)
 				{
 					case 'toplevel_page_open-brain':
-						$plugin_page_title = __('Settings', 'General');
+						$plugin_page_title = __('Settings');
 						$plugin_page_icon = "dashicons-admin-generic";
 						break;
 					case 'open-brain_page_open_brain_image':
-						$plugin_page_title = __('Images', 'General');
+						$plugin_page_title = __('Images');
 						$plugin_page_icon = "dashicons-format-image";
 						break;
 					case 'open-brain_page_open_brain_content':
-						$plugin_page_title = __('Content', 'General');
+						$plugin_page_title = __('Content');
 						$plugin_page_icon = "dashicons-format-aside";
 						break;
 				}
@@ -244,7 +249,7 @@ if(!class_exists('open_brain_plugin') )
 					$this->plugin_option_direct = intval($_POST['open_brain_direct_mode']);
 				    if ($this->plugin_option_direct == 1) {$open_brain_direct_mode_checked = "checked";}
 				}
-		    	$this->plugin_option_api_key = sanitize_key(sanitize_text_field($_POST['open_brain_api_key']));
+		    	$this->plugin_option_api_key = sanitize_text_field($_POST['open_brain_api_key']);
 				update_option($this->plugin_name."-data", array(
 				  'api_key' => $this->plugin_option_api_key,
 				  'debug' => $this->plugin_option_debug,
@@ -252,6 +257,8 @@ if(!class_exists('open_brain_plugin') )
 				));
 
 		    }
+		    $caption_savechange = __("Save Changes");
+  			$caption_debug = __('Debug');
 			$output = '
 				<div class="wrap">
 					<form method="post" novalidate="novalidate">
@@ -272,7 +279,7 @@ if(!class_exists('open_brain_plugin') )
 									</td>
 								</tr>
 								<tr>
-									<th scope="row">Debug</th>
+									<th scope="row">'.$caption_debug.'</th>
 									<td> 
 										<fieldset>
 											<legend class="screen-reader-text">
@@ -302,7 +309,7 @@ if(!class_exists('open_brain_plugin') )
 							</tbody>
 						</table>
 						<p class="submit">
-							<input type="submit" name="submit" id="submit" class="button button-primary" value="Save Changes">
+							<input type="submit" name="submit" id="submit" class="button button-primary" value="'.$caption_savechange.'">
 						</p>
 					</form>
 				</div>
@@ -311,15 +318,20 @@ if(!class_exists('open_brain_plugin') )
   		}
   		function func_page_image()
   		{
-  			$open_brain_image_prompt = "OpenBrain.Digital WordPress AI Plugin";
+  			$site_title = get_bloginfo('name');
+  			$open_brain_image_prompt = "$site_title";
   			$open_brain_image_number = 3;
+  			$caption_description = __('Description');
+  			$caption_fetch = __('Search');
+  			$caption_size = __('Size');
+  			$caption_number = __('Number');
 			$output = '
 				<div class="wrap">
 					<table class="form-table" role="presentation">
 						<tbody>
 							<tr>
 								<th scope="row">
-									<label for="open_brain_image_prompt">Description</label>
+									<label for="open_brain_image_prompt">'.$caption_description.'</label>
 								</th>
 								<td>
 									<input name="open_brain_image_prompt" type="text" id="open_brain_image_prompt" value="'.$open_brain_image_prompt.'" class="regular-text">
@@ -330,7 +342,7 @@ if(!class_exists('open_brain_plugin') )
 							</tr>
 							<tr>
 								<th scope="row">
-									<label for="open_brain_image_prompt">Number</label>
+									<label for="open_brain_image_prompt">'.$caption_number.'</label>
 								</th>
 								<td>
 									<input type="number" name="open_brain_image_prompt" id="open_brain_image_number" value="'.$open_brain_image_number.'" class="regular-text">
@@ -341,7 +353,7 @@ if(!class_exists('open_brain_plugin') )
 							</tr>
 							<tr>
 								<th scope="row">
-									<label for="open_brain_image_prompt">Size</label>
+									<label for="open_brain_image_prompt">'.$caption_size.'</label>
 								</th>
 								<td>
 									<select name="open_brain_image_size" id="open_brain_image_size">
@@ -357,7 +369,7 @@ if(!class_exists('open_brain_plugin') )
 						</tbody>
 					</table>
 					<p class="submit">
-						<input type="button" id="fetch_image" class="button button-primary" value="Fetch">
+						<input type="button" id="fetch_image" class="button button-primary" value="'.$caption_fetch.'">
 					</p>
 				</div>
 				<div class="wrap" id="open_brain_result_image">
@@ -375,16 +387,27 @@ if(!class_exists('open_brain_plugin') )
 			$output_page_types = "";
 			foreach ($page_types as $page_type){$output_page_types.= '<option value="'.$page_type.'">'.$page_type.'</option>';}
   			$open_brain_content_title = "";
-  			$open_brain_content_prompt = "Write a post about Farid SanieePour";
+  			$site_title = get_bloginfo('name');
+  			$site_description = get_bloginfo('description');
+  			$open_brain_content_prompt = "Write a post about $site_title";
   			$open_brain_content_token = 200;
   			$open_brain_content_temperatures = 0.5;
+  			$caption_description = __('Description');
+  			$caption_fetch = __('Search');
+  			$caption_view = __('View');
+  			$caption_save = __('Save');
+  			$caption_title = __('Title');
+  			$caption_status = __('Status');
+  			$caption_type = __('Type');
+  			$caption_excerpt = __('Excerpt');
+  			$caption_body = __('Text');
 			$output = '
 				<div class="wrap">
 					<table class="form-table" role="presentation">
 						<tbody>
 							<tr>
 								<th scope="row">
-									<label for="open_brain_content_prompt">Description</label>
+									<label for="open_brain_content_prompt">'.$caption_description.'</label>
 								</th>
 								<td>
 									<input name="open_brain_content_prompt" type="text" id="open_brain_content_prompt" value="'.$open_brain_content_prompt.'" class="regular-text">
@@ -393,7 +416,7 @@ if(!class_exists('open_brain_plugin') )
 									</p>
 								</td>
 							</tr>
-							<tr>
+							<tr class="d-none" style="display:none">
 								<th scope="row">
 									<label for="open_brain_content_token">Number of word</label>
 								</th>
@@ -404,7 +427,7 @@ if(!class_exists('open_brain_plugin') )
 									</p>
 								</td>
 							</tr>
-							<tr>
+							<tr class="d-none" style="display:none">
 								<th scope="row">
 									<label for="open_brain_content_temperatures">Creativity</label>
 								</th>
@@ -417,37 +440,46 @@ if(!class_exists('open_brain_plugin') )
 							</tr>
 						</tbody>
 					</table>
-					<p class="submit">
-						<input type="button" id="fetch_content" class="button button-primary" value="Fetch">
+					<p class="submit" style="margin:0px;">
+						<input type="button" id="fetch_content" class="button button-primary" value="'.$caption_fetch.'">
 					</p>
 				</div>
-				<div class="wrap" id="open_brain_result_content">
-					<div class="box_button d-none">
+				<div class="wrap d-none" id="open_brain_result_content">
+					<div class="bg-white" style="padding:10px">
+						<div class="box_button">
+
+							<label for="open_brain_content_status">'.$caption_status.'</label>
+							<select name="open_brain_content_status" id="open_brain_content_status">
+								'.$output_page_status.'
+							</select>
+							<label for="open_brain_content_type">'.$caption_type.'</label>
+							<select name="open_brain_content_type" id="open_brain_content_type">
+								'.$output_page_types.'
+							</select>
+							<input type="button" class="button button-primary add_content" value="'.$caption_save.'">
+							<a href="" target="_blank" class="button button-primary view_content d-none">'.$caption_view.'</a>
+						</div>
 						<div>
-							<label for="open_brain_content_title">Title</label>
-							<input name="open_brain_content_title" type="text" id="open_brain_content_title" value="'.$open_brain_content_title.'" class="regular-text">
+							<label for="open_brain_content_title">'.$caption_title.'</label>
+							<input name="open_brain_content_title" type="text" id="open_brain_content_title" value="'.$open_brain_content_title.'" class="large-text">
 							<input type="button" class="button button-primary suggest_title" value="Suggest Title by AI">
 							<p class="description" id="tagline-description">
 							Enter Title of Post
 							</p>
 						</div>
-						<label for="open_brain_content_status">Status</label>
-						<select name="open_brain_content_status" id="open_brain_content_status">
-							'.$output_page_status.'
-						</select>
-						<label for="open_brain_content_type">Type</label>
-						<select name="open_brain_content_type" id="open_brain_content_type">
-							'.$output_page_types.'
-						</select>
-						<input type="button" class="button button-primary add_content" value="Save">
-						<a href="" target="_blank" class="button button-primary view_content d-none">View</a>
+						<div class="excerpt">
+							<label for="open_brain_excerpt">'.$caption_excerpt.'</label>
+							<textarea class="large-text code" rows ="3" cols="50" name="open_brain_excerpt" id="open_brain_excerpt"></textarea>
+						</div>
+						<label for="open_brain_body">'.$caption_body.'</label>
+						<div class="content large-text" rows ="10" cols="50" name="open_brain_body" id="open_brain_body"></div>
 					</div>
-					<div class="content d-none"></div>
 				</div>
 			';
+
 			return $output;
   		}
-		
+
 		function do_all_actions()
 		{
 			if(!current_user_can('administrator')) {return;}

@@ -47,19 +47,20 @@ function open_brain_save_content($data)
 	$action = "";
 	if(isset($parameters['action'])){$action = $parameters['action'];}
 	$body = $data->get_body();
-	$body = stripslashes($body);
+	//$body = stripslashes($body);
 	$body = json_decode($body);
-	if(isset($body->src))
+	if(isset($body->type))
 	{
 		$content = $body->content;
 		$title = esc_html($body->title);
 		$status = $body->status;
 		$type = $body->type;
 		$prompt = $body->prompt;
+		$excerpt = $body->excerpt;
 		$post_data = array(
 			'tags_input' => array("open-brain"),
 			'post_content_filtered'=> sanitize_textarea_field(wp_strip_all_tags($content)),
-			'post_excerpt' => $prompt,
+			'post_excerpt' => $excerpt,
 			'post_title' => wp_strip_all_tags($title),
 			'post_content' => $content,
 			'post_status' => $status,
@@ -84,10 +85,10 @@ function open_brain_api_result($data)
 			$url = "/images/generations";
 			break;
 		case 'completions':
-			$url = "/completions";
+			$url = "/chat/completions";
 			break;
 		case 'completions_title':
-			$url = "/completions";
+			$url = "/chat/completions";
 			break;
 		default:
 			$url = "";
@@ -96,6 +97,14 @@ function open_brain_api_result($data)
 	}
 	$open_brain_plugin = new open_brain_plugin();
 	$open_brain_debug_mode = $open_brain_plugin->plugin_option_debug;
+	$open_brain_direct = $open_brain_plugin->plugin_option_direct;
+	$open_brain_version = $open_brain_plugin->version;
+	$site_url_encode = urlencode(get_site_url());
+	$base_url = $open_brain_plugin->plugin_base_url_openbrain.$url."?&version=$open_brain_version&url=$site_url_encode";
+	if($open_brain_direct)
+	{
+		$base_url = $open_brain_plugin->plugin_base_url_openai.$url;
+	}
 	$open_header =  array('Authorization' => 'Bearer '.$open_brain_plugin->plugin_option_api_key,'Content-Type' => 'application/json','Accept' => 'application/json');
 	$open_body = $body;
 	$open_option = array
@@ -109,7 +118,7 @@ function open_brain_api_result($data)
 		'body'        => $open_body,
 		'cookies'     => array()
 	);
-	$response = wp_remote_post($open_brain_plugin->plugin_base_url.$url, $open_option);
+	$response = wp_remote_post($base_url, $open_option);
 	print_r($response['body']);
 	//the_content(($response['body']));
 }

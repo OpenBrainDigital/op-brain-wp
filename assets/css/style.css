@@ -19,7 +19,8 @@
             }
 }
 
-.d-none{display: none;}
+.bg-white{background: #FFF;}
+.d-none{display: none !important;}
 #open_brain_result_image{ width: 90%; display: -webkit-box;display: -ms-flexbox;display: flex;-ms-flex-wrap: wrap;flex-wrap: wrap;margin-right: -15px;margin-left: -15px;}
 #open_brain_result_image .box{margin: 5px; padding: 10px; border: 1px solid #cecece; background:#FFF; flex-basis: 0;-webkit-box-flex: 1;-ms-flex-positive: 1;flex-grow: 1;}
 #open_brain_result_image .box:hover{box-shadow:1px 1px 5px 2px rgb(0 0 0 / 10%);}
